@@ -1,0 +1,16 @@
+{
+  "manifest_version": 3,
+  "name": "Custom YouTube Speed",
+  "version": "1.0",
+  "description": "Set custom playback speed for YouTube videos",
+  "permissions": ["activeTab"],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://www.youtube.com/*"],
+      "js": ["content.js"]
+    }
+  ]
+}
