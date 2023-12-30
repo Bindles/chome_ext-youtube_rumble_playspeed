@@ -1,15 +1,15 @@
 {
   "manifest_version": 3,
-  "name": "Custom YouTube Speed",
+  "name": "Custom Video Speed",
   "version": "1.0",
-  "description": "Set custom playback speed for YouTube videos",
+  "description": "Set custom playback speed for videos on YouTube and Rumble",
   "permissions": ["activeTab"],
   "action": {
     "default_popup": "popup.html"
   },
   "content_scripts": [
     {
-      "matches": ["*://www.youtube.com/*"],
+      "matches": ["*://www.youtube.com/*", "*://rumble.com/*"],
       "js": ["content.js"]
     }
   ]

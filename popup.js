@@ -1,15 +1,42 @@
 document.addEventListener("DOMContentLoaded", function () {
-  document.getElementById("setSpeedButton").addEventListener("click", setSpeed);
-  document.getElementById("logHiButton").addEventListener("click", logHi);
-});
+  const speedInput = document.getElementById("speedInput");
+  const setSpeedButton = document.getElementById("setSpeedButton");
 
-function setSpeed() {
-  const speed = document.getElementById("speedInput").value;
-  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-    chrome.tabs.sendMessage(tabs[0].id, { action: "setSpeed", speed: speed });
+  setSpeedButton.addEventListener("click", setSpeed);
+
+  // Listen for changes in the currently active tab
+  chrome.tabs.onActivated.addListener(function () {
+    sendMessageToContentScript({ action: "getSpeed" }, updateSpeedInput);
   });
-}
 
-function logHi() {
-  console.log("Hi");
-}
+  // Listen for changes in the tab content
+  chrome.tabs.onUpdated.addListener(function () {
+    sendMessageToContentScript({ action: "getSpeed" }, updateSpeedInput);
+  });
+
+  // Initial update of the speed input
+  sendMessageToContentScript({ action: "getSpeed" }, updateSpeedInput);
+
+  function setSpeed() {
+    const speed = speedInput.value;
+    sendMessageToContentScript({ action: "setSpeed", speed: speed });
+  }
+
+  function updateSpeedInput(response) {
+    const currentSpeed = response && response.speed ? response.speed : "";
+    speedInput.value = currentSpeed;
+    speedInput.placeholder = `Current Speed: ${currentSpeed || "N/A"}`;
+  }
+
+  function sendMessageToContentScript(message, callback) {
+    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+      const currentTab = tabs[0];
+      if (
+        currentTab.url.includes("www.youtube.com") ||
+        currentTab.url.includes("rumble.com")
+      ) {
+        chrome.tabs.sendMessage(currentTab.id, message, callback);
+      }
+    });
+  }
+});
